@@ -1,0 +1,11 @@
+# Rust / Cargo
+/target
+**/*.rs.bk
+**/*.rlib
+/Cargo.lock
+
+# VSCode
+.vscode/
+
+# other
+.env
