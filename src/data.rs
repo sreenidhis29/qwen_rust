@@ -1,4 +1,5 @@
 // data.rs
+#![allow(dead_code)]
 use candle_core::{Tensor, Device, Result};
 use std::fs;
 

@@ -1,4 +1,5 @@
 // inference.rs
+#![allow(dead_code, unused_imports)]
 use candle_core::{Tensor, Result, D, DType};
 use candle_nn::ops::softmax_last_dim;
 use rand::distributions::{WeightedIndex, Distribution};
@@ -9,9 +10,9 @@ pub fn generate(
     model: &MinimalLLM,
     mut tokens: Vec<u32>,
     max_length: usize,
-    temperature: f64,
+    temperature: f32,
     top_k: usize,
-    top_p: f64,
+    top_p: f32,
     eos_token_id: u32,
     device: &candle_core::Device,
 ) -> Result<Vec<u32>> {
@@ -21,7 +22,7 @@ pub fn generate(
         let t = logits.dim(1)?;
         let last = logits.narrow(1, t - 1, 1)?.squeeze(1)?.squeeze(0)?; // (vocab,)
 
-        let logits_vec: Vec<f32> = (last / temperature)?.to_vec1()?;
+        let logits_vec: Vec<f32> = (last / (temperature as f64))?.to_vec1()?;
         let mut logits_vec = logits_vec;
 
         // Top-k

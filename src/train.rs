@@ -1,4 +1,5 @@
 // train.rs
+#![allow(dead_code, unused_variables, unused_imports)]
 use candle_core::{Tensor, Result, DType, D};
 use candle_nn::{AdamW, ParamsAdamW, Optimizer, loss::cross_entropy};
 use crate::config::ModelConfig;
@@ -59,7 +60,7 @@ pub fn train_model(
         let lr = optimizer.learning_rate() * 0.0 + (cfg.muon_lr * 0.1) * lr_lambda(step, warmup_steps, cfg.max_steps);
         optimizer.set_learning_rate(lr);
 
-        let loss = train_step(model, &mut optimizer, x, y, cfg.vocab_size.unwrap(), cfg.gradient_accumulation_steps)?;
+        let loss = train_step(model, &mut optimizer, x, y, cfg.vocab_size, cfg.gradient_accumulation_steps)?;
 
         if step % 10 == 0 {
             println!("step {step}: loss={loss:.4}, lr={lr:.2e}");

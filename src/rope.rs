@@ -1,5 +1,6 @@
 // rope.rs
-use candle_core::{Tensor, Device, DType, Result};
+#![allow(unused_imports)]
+use candle_core::{Tensor, Device, Result};
 
 pub struct Rotary {
     cos: Tensor, // (max_seq_len, head_dim/2)
@@ -47,5 +48,31 @@ impl Rotary {
         let y2 = (x2.broadcast_mul(&cos)? - x1.broadcast_mul(&sin)?)?;
 
         Tensor::cat(&[&y1, &y2], 3)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use candle_core::Device;
+
+    #[test]
+    fn test_rope_identity_at_t0() {
+        let device = Device::Cpu;
+        let head_dim = 8;
+        let rotary = Rotary::new(head_dim, 4, &device).unwrap();
+
+        // x: (1, 1, 1, 8) — single token at position 0
+        let x = Tensor::arange(0f32, 8f32, &device).unwrap()
+            .reshape((1, 1, 1, 8)).unwrap();
+
+        let out = rotary.forward(&x).unwrap();
+        let x_vec: Vec<f32> = x.flatten_all().unwrap().to_vec1().unwrap();
+        let out_vec: Vec<f32> = out.flatten_all().unwrap().to_vec1().unwrap();
+
+        // At t=0, theta=0 -> cos=1, sin=0 -> output == input
+        for (a, b) in x_vec.iter().zip(out_vec.iter()) {
+            assert!((a - b).abs() < 1e-5, "expected {a}, got {b}");
+        }
     }
 }

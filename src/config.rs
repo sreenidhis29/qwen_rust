@@ -1,4 +1,5 @@
 // config.rs
+#![allow(dead_code, unused_variables)]
 pub struct ModelConfig {
     pub d_model: usize,
     pub n_heads: usize,
@@ -10,6 +11,13 @@ pub struct ModelConfig {
     pub dropout: f32,
     pub attention_bias: bool,
     pub vocab_size: usize,
+    // training/eval params
+    pub muon_lr: f64,
+    pub weight_decay: f64,
+    pub max_steps: usize,
+    pub gradient_accumulation_steps: usize,
+    pub eval_every: usize,
+    pub eval_steps: usize,
 }
 
 impl ModelConfig {

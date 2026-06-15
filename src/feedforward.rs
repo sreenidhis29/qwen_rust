@@ -29,3 +29,30 @@ impl SwiGLUFeedForward {
         self.down_proj.forward(&hidden)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use candle_core::{Device, DType};
+    use candle_nn::VarBuilder;
+
+    #[test]
+    fn test_silu_value() {
+        let device = Device::Cpu;
+        let x = Tensor::new(&[1f32], &device).unwrap();
+        let out = candle_nn::ops::silu(&x).unwrap();
+        let val: f32 = out.flatten_all().unwrap().to_vec1::<f32>().unwrap()[0];
+        // silu(1.0) = 1 * sigmoid(1) ≈ 0.7311
+        assert!((val - 0.7311).abs() < 1e-3);
+    }
+
+    #[test]
+    fn test_swiglu_shapes() {
+        let device = Device::Cpu;
+        let vb = VarBuilder::zeros(DType::F32, &device);
+        let ffn = SwiGLUFeedForward::new(4, 8, 0.0, vb.pp("ffn")).unwrap();
+        let x = Tensor::zeros((1, 2, 4), DType::F32, &device).unwrap();
+        let out = ffn.forward(&x, false).unwrap();
+        assert_eq!(out.dims(), &[1, 2, 4]);
+    }
+}

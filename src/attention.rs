@@ -1,4 +1,5 @@
 // attention.rs
+#![allow(unused_imports)]
 use candle_core::{Tensor, Device, DType, Result, D};
 use candle_nn::{Linear, Module, VarBuilder, linear_no_bias, linear};
 use crate::config::ModelConfig;
